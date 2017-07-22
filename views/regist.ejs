@@ -1,0 +1,102 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- <link rel="icon" href="../../favicon.ico"> -->
+
+    <title>Jumbotron Template for Bootstrap</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+
+
+    <!-- Custom styles for this template -->
+    <link href="/css/jumbotron.css" rel="stylesheet">
+    <style>
+		#errmsg{
+			margin-top:10px;
+			display:none;
+		}
+    </style>
+
+  </head>
+
+  <body>
+
+    <% include header.ejs %>
+
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+
+
+    <div class="container">
+		<form id='form'>
+		  <div class="form-group">
+		  	<h4>plese fill regist info:</h4>
+		    <label for="username">username</label>
+		    <input type="text" class="form-control" id="username" placeholder="username">
+		  </div>
+		  <div class="form-group">
+		    <label for="password">password</label>
+		    <input type="password" class="form-control" id="password" placeholder="password">
+		  </div>
+		  <div class="form-group">
+		    <label for="exampleInputFile">File input</label>
+		    <input type="file" id="exampleInputFile">
+		    <p class="help-block">Example block-level help text here.</p>
+		  </div>
+		  <div class="checkbox">
+		    <label>
+		      <input type="checkbox"> Check me out
+		    </label>
+		  </div>
+		  <input type="button" class="btn btn-default" id='submit' value='Submit'>
+		</form>
+		<div class="alert alert-warning" role="alert" id='errmsg'>the username has been used</div>
+      <hr>
+
+      <footer>
+        <p>&copy; 2016 Company, Inc.</p>
+      </footer>
+    </div> <!-- /container -->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/js/jquery.js"></script>
+<!--     <script>window.jQuery || document.write('<script src="/js/jquery.js"><\/script>')</script> -->
+    <script src="/js/bootstrap.min.js"></script>
+    <script>
+    $(document).ready(function(){
+    	//输入的时候 自动消失
+    	
+    	$('#submit').click(function(){
+	    	$.post('/doregist',{
+	    		'username':$('#username').val(),
+	    		'password':$('#password').val()
+	    	},function(result){
+	    		if (result=='1') {
+	    			//ok
+	    			$('#errmsg').fadeIn();
+	    			$('#errmsg').html('regist sucess.locat to index');
+	    			//自动跳转到首页
+	    			window.location='/';
+	    		}else if (result=='-1') {
+	    			//bu ok
+	    		}else if (result=='-3') {
+	    			$('#errmsg').fadeIn();
+	    		}
+	    	});    		
+    	});
+
+    });
+    </script>
+
+  </body>
+</html>

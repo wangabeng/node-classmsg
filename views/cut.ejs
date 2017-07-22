@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Aspect Ratio with Preview Pane | Jcrop Demo</title>
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+
+<script src="./js/jquery.min.js"></script>
+<script src="./js/jquery.Jcrop.js"></script>
+
+<link rel="stylesheet" href="./css/jquery.Jcrop.css" type="text/css" />
+<style type="text/css">
+
+/* Apply these styles only when #preview-pane has
+   been placed within the Jcrop widget */
+.jcrop-holder #preview-pane {
+  display: block;
+  position: absolute;
+  z-index: 2000;
+  top: 10px;
+  right: -280px;
+  padding: 6px;
+  border: 1px rgba(0,0,0,.4) solid;
+  background-color: white;
+
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+
+  -webkit-box-shadow: 1px 1px 5px 2px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow: 1px 1px 5px 2px rgba(0, 0, 0, 0.2);
+  box-shadow: 1px 1px 5px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* The Javascript code will set the aspect ratio of the crop
+   area based on the size of the thumbnail preview,
+   specified here */
+#preview-pane .preview-container {
+  width: 100px;
+  height: 100px;
+  overflow: hidden;
+}
+
+</style>
+<script src="./js/basic.js"></script>
+
+
+</head>
+<body>
+
+
+  <img src="./avatar/<%=avatar %>.jpg" id="target" alt="[Jcrop Example]" />
+
+  <div id="preview-pane">
+    <div class="preview-container">
+      <img src="./avatar/<%=avatar %>.jpg" class="jcrop-preview" alt="Preview" />
+    </div>
+  </div>
+
+
+<!-- </div>
+</div>
+</div>
+</div> -->
+  <input type="button" id='getposition' value='getposition'>
+
+</body>
+</html>
+
+<script type="text/javascript">
+    //获取坐标值
+    $('#getposition').click(function(){
+      var target=$('.jcrop-holder>div:first');
+      var w=target.css('width'); 
+      var h=target.css('height'); 
+      var l=target.css('left'); 
+      var t=target.css('top'); 
+      //alert(tarWidth+' '+tarHeight+' '+tarLeft+' '+tarTop);
+      // alert(22);
+      //发送get请求 传递参数
+      $.get('/docut',{
+        'w':parseInt(w),
+        'h':parseInt(h),
+        'l':parseInt(l),
+        't':parseInt(t)
+      },function(result){
+        if(result=='1'){
+          //如果结果是1 跳转到首页 利用前端来跳转
+          window.location='/'
+        }
+      });
+
+    });
+
+
+</script>
+

@@ -1,0 +1,244 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- <link rel="icon" href="../../favicon.ico"> -->
+
+    <title>Jumbotron Template for Bootstrap</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+
+
+    <!-- Custom styles for this template -->
+    <link href="/css/jumbotron.css" rel="stylesheet">
+    <style>
+    #errmsg{
+      margin-top:10px;
+      display:none;
+    }
+    #sendyy{
+      margin-top:10px;
+    }
+    #sendalert{
+      margin-top:10px;
+      display:none;
+    }
+    #portrait{
+      width:100px;
+      height:100px;
+    }
+    </style>
+  </head>
+
+  <body>
+
+    <% include header.ejs %>
+
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <!-- 如果没有登录 就显示注册提示 -->
+    <% if(login!='1'){ %>
+    <div class="jumbotron">
+      <div class="container">
+        <div class='row'>
+          <div class='col-md-6'>
+            <h2>
+              classYY is a good communication place
+            </h2>
+            <p>regist your account now.</p>
+            <p><a class="btn btn-primary btn-lg" href="/regist" role="button">regist </a></p>
+          </div>
+
+          <div class='col-md-6'>
+            <form id='form'>
+              <div class="form-group">
+                <h4>have a account and login </h4>
+                <label for="username">username</label>
+                <input type="text" class="form-control" id="username" placeholder="username">
+              </div>
+              <div class="form-group">
+                <label for="password">password</label>
+                <input type="password" class="form-control" id="password" placeholder="password">
+              </div>
+
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox"> Check me out
+                </label>
+              </div>
+              <input type="button" class="btn btn-default" id='login' value='login'>
+            </form>
+            <div class="alert alert-warning" role="alert" id='errmsg'>the username has been used</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <% }else{ %>
+    <div class="jumbotron">
+      <div class="container">
+        <div class='row'>
+          <div class='col-md-2'>
+            <h1>
+              <a href="/setavatar">
+                <img id='portrait' src="/avatar/<%=avatar  %>.jpg" alt="">
+              </a>
+            </h1>
+          </div>
+          <div class='col-md-6'>
+            <p>welcome <%=username %></p>
+            <textarea class="form-control" cols='80' rows='4' id='content'></textarea>
+            <button type="button" class="btn btn-success" id='sendyy'>send YY</button>
+            <!-- 发布是否成功提示框 -->
+            <div class="alert alert-warning" role="alert" id='sendalert'></div>            
+          </div>
+
+        </div>
+
+
+      </div>
+    </div>
+    <% } %>
+
+    <!-- 说说列表 用ajax代替以前的请求-->
+    <div class="container">
+      <!-- Example row of columns -->
+      <div class="row" id='allyy'>
+      <!-- 一个 单元模块 模板引擎遍历 -->
+        <!-- 当处于登录状态 才这样渲染页面 -->
+<!--         <% if (login=='1'){ %>
+        <% for(var i=0;i<yyarr.length;i++){ %>
+        <div class="col-md-4">
+          <img src='./avatar/<%=yyarr[i].username %>.jpg'>
+          <h3><%=yyarr[i].username %>&nbsp;say:</h3>
+          <p><%=yyarr[i].content %></p>
+          <p><%=yyarr[i].datetime %></p>
+        </div>
+        <% } %>
+        <% } %> 改成前端模板引擎-->
+        <script type='text/template' id='template'>
+          <div class="col-md-4">
+            <img src='./avatar/{{=avatar}}.jpg'>
+            <h3>{{=username}}&nbsp;say:</h3>
+            <p>{{=content}}</p>
+            <p>{{=datetime}}</p>
+          </div>
+        </script>
+
+      </div>
+
+      <hr>
+
+      <footer>
+        <p>&copy; 2016 Company, Inc.</p>
+      </footer>
+    </div> <!-- /container -->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/js/jquery.js"></script>
+    <script>window.jQuery || document.write('<script src="/js/jquery.js"><\/script>')</script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/underscore-nonflect.js"></script>
+    <script>
+    $(document).ready(function(){
+      //ajax读取文章列表
+      var html=$('#template').html();
+      var compiled=_.template(html);
+      $.ajax({ //强行把ajax改成同步的 会影响用户体验 所以这里用迭代器
+        //得到所有的说说
+        url:'/getallyy?page=0',
+        type:'get',
+        success:function(result){
+          // 回调函数 显示每个用户的头像
+          iterator(0);
+          function iterator(i) {
+            if (i==result.length) {//又是等号惹得祸 坑1
+              return;
+            }
+            $.ajax({
+              url:"/getuserinfo?username="+result[i].username,
+              type:'get',
+              success:function(result2){//坑2 result2是个数组 console.log(result2[0].avatar);
+                // result[i].avatar=result2[0].avatar;
+                var htmlString=compiled({
+                  'username':result[i].username,
+                  'content':result[i].content,
+                  'datetime':result[i].datetime,
+                  'avatar':result2[0].avatar
+                });
+                $('#allyy').append(htmlString);
+                iterator(i+1);
+                
+              }
+
+            });//ajax
+
+          }//function结束
+
+        }//success
+
+      });
+      
+      $('#login').click(function(){
+        $.post('/dologin',{
+          'username':$('#username').val(),
+          'password':$('#password').val()
+        },function(result){
+          if (result=='1') {
+            //ok登录成功
+            $('#errmsg').fadeIn();
+            $('#errmsg').html('login sucess');
+            //自动跳转到首页
+            window.location='/';
+          }else if (result=='-1') {
+            $('#errmsg').fadeIn();
+            $('#errmsg').html('password err');
+          }else if (result=='-3') {
+            $('#errmsg').fadeIn();
+            $('#errmsg').html('-3 err');
+          }
+        });       
+      });
+
+      //发表内容说
+      $('#sendyy').click(function(){
+        $.post('/sendyy',{
+          'content':$('#content').val()
+        },function(result){
+          var sendalert=$('#sendalert');
+          if (result=='1') {
+            sendalert.fadeIn();
+            sendalert.html('sendyy sucess');
+            window.location='/';
+          }else{
+            sendalert.fadeIn();
+            sendalert.html('sendyy failture');
+          }
+        });
+      });
+
+      //输入框获取焦点 提示框就自动隐藏
+      $('#content').focus(function(){
+        $('#sendalert').fadeOut();
+      });
+
+    });
+    </script>
+  </body>
+</html>
+
+<!--             var htmlString=compiled({
+              'username':result[i].username,
+              'content':result[i].content,
+              'datetime':result[i].datetime
+            });
+            $('#allyy').append(htmlString); -->
