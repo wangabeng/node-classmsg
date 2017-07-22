@@ -53,6 +53,5 @@ app.post('/sendyy',router.doSendyy);
  app.get('/getallamount',router.getallamount);
 
 // app.listen(3000);
-app.set('port', (process.env.PORT || 5000));
-
-
+var serverPort = process.env.PORT || 5000;
+app.listen(serverPort);
